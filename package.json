@@ -7,13 +7,14 @@
     "dev": "next dev",
     "prebuild": "node scripts/copy-vendor.mjs",
     "build": "next build",
-    "start": "npx serve out",
+    "start": "node scripts/serve-out.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "pages:dev": "wrangler pages dev out",
-    "pages:deploy": "npm run build && wrangler pages deploy out"
+    "pages:deploy": "npm run build && wrangler pages deploy out",
+    "status": "GENERATE_STATUS=1 vitest run tests/status-report.test.ts"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.11.1",
