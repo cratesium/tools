@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/public/vendor/
+
+# cloudflare
+.wrangler/
+.dev.vars
+
+# playwright
+/test-results/
+/playwright-report/
+!.env.example
