@@ -3,10 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/copy-vendor.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/copy-vendor.mjs",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "npx serve out",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "pages:dev": "wrangler pages dev out",
+    "pages:deploy": "npm run build && wrangler pages deploy out"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.11.1",
@@ -68,5 +75,8 @@
     "typescript": "^5",
     "vitest": "^4.1.12",
     "wrangler": "^4.166.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
