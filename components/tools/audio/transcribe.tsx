@@ -8,7 +8,7 @@ import { ActionBar, DownloadButton, ErrorMessage, Panel, Settings, TaskProgress,
 import { formatBytes } from "@/lib/utils/format";
 import { formatClock, formatSrtTime, formatTimecode } from "@/lib/processors/media/timecode";
 import { useTask } from "@/lib/utils/hooks";
-import { MediaPicker, Player, baseOf, useMedia } from "../video/media-common";
+import { AUDIO_ACCEPT, MediaPicker, Player, VIDEO_ACCEPT, baseOf, useMedia } from "../video/media-common";
 
 interface Segment {
   start: number;
@@ -95,7 +95,7 @@ export default function AudioToText(_: ToolComponentProps) {
 
   return (
     <div className="space-y-4">
-      <MediaPicker file={file} onFile={(f) => (setFile(f), task.reset(), setPartial([]))} kind="audio" label="Audio or video: MP3, WAV, M4A, OGG, WebM, MP4…" />
+      <MediaPicker file={file} onFile={(f) => (setFile(f), task.reset(), setPartial([]))} kind="audio" accept={`${AUDIO_ACCEPT},${VIDEO_ACCEPT}`} label="Audio or video: MP3, WAV, M4A, OGG, WebM, MP4…" />
       <Player url={url} kind="audio" />
       <Panel title="Settings">
         <div className="space-y-4">
