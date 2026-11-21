@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "pages:dev": "wrangler pages dev out",
     "pages:deploy": "npm run build && wrangler pages deploy out",
-    "status": "GENERATE_STATUS=1 vitest run tests/status-report.test.ts"
+    "status": "GENERATE_STATUS=1 vitest run tests/status-report.test.ts",
+    "postbuild": "node scripts/postbuild.mjs"
   },
   "dependencies": {
     "@cantoo/pdf-lib": "^2.11.1",
