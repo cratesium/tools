@@ -159,7 +159,7 @@ Manual deploy (optional): `npx wrangler login && npm run pages:deploy`.
 
 | Name | Where | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | build | Canonical base URL (default `https://utilityhub.pages.dev`) |
+| `NEXT_PUBLIC_SITE_URL` | build | Canonical base URL (default `https://utilityhub-4kt.pages.dev`) |
 | `NODE_VERSION` | Cloudflare build | Use Node 22 |
 | `CF_ACCOUNT_ID` | Functions | Browser Rendering screenshot API |
 | `CF_API_TOKEN` (secret) | Functions | Browser Rendering screenshot API |

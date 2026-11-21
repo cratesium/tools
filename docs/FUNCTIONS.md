@@ -19,7 +19,7 @@ Under `next dev` the endpoints don't exist. The UI detects this (network error o
 - **Same-origin only**: requests carrying a cross-site `Origin` / `Sec-Fetch-Site` are rejected, and no CORS headers are sent.
 - **Rate limiting**: a best-effort in-memory, per-isolate, per-IP limiter. For real protection, add a Cloudflare **Rate Limiting rule** on `/api/*` (Security → WAF → Rate limiting rules), for example 60 requests per minute per IP.
 - **JSON errors**: `{ "error": "<code>", "message": "<human text>" }` with a proper status code.
-- **User-Agent**: `UtilityHubBot/1.0 (+https://utilityhub.pages.dev)`.
+- **User-Agent**: `UtilityHubBot/1.0 (+https://utilityhub-4kt.pages.dev)`.
 
 ## Endpoints
 

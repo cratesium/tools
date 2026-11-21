@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Lock, Zap, Globe2 } from "lucide-react";
 import { Container } from "@/components/layout/container";
@@ -16,12 +17,19 @@ import {
 } from "@/lib/tools/registry";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/seo/site";
 
+export const metadata: Metadata = {
+  alternates: { canonical: absoluteUrl("/") },
+};
+
 export default function Home() {
   const counts = getCategoryCounts();
-  const popular = getPopularTools(12).map(toSummary);
-  const featured = getFeaturedTools(6).map(toSummary);
-  const recent = getRecentTools(8).map(toSummary);
   const fallback = tools.filter((t) => t.status !== "planned");
+  const popularTools = getPopularTools(12);
+  const popular = (popularTools.length ? popularTools : fallback.slice(0, 12)).map(toSummary);
+  const shown = new Set(popular.map((t) => t.slug));
+  const featured = getFeaturedTools(20).filter((t) => !shown.has(t.slug)).slice(0, 6).map(toSummary);
+  featured.forEach((t) => shown.add(t.slug));
+  const recent = getRecentTools(40).filter((t) => !shown.has(t.slug)).slice(0, 8).map(toSummary);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -67,7 +75,7 @@ export default function Home() {
 
       <Container className="py-16">
         <SectionHeader title="Popular tools" href="/tools" />
-        <ToolGrid tools={popular.length ? popular : fallback.slice(0, 12).map(toSummary)} />
+        <ToolGrid tools={popular} />
       </Container>
 
       <section id="categories" className="scroll-mt-16 border-y border-border bg-bg-subtle">

@@ -88,7 +88,7 @@ export interface HandlerDeps {
 /* Constants                                                           */
 /* ------------------------------------------------------------------ */
 
-export const USER_AGENT = "UtilityHubBot/1.0 (+https://utilityhub.pages.dev)";
+export const USER_AGENT = "UtilityHubBot/1.0 (+https://utilityhub-4kt.pages.dev)";
 export const MAX_URL_LENGTH = 2048;
 export const MAX_REDIRECTS = 10;
 export const DEFAULT_TIMEOUT_MS = 10_000;

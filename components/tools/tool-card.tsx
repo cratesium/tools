@@ -16,7 +16,7 @@ export function ToolCard({ tool }: { tool: ToolSummary }) {
         <StatusBadge status={tool.status} />
       </div>
       <div className="space-y-1">
-        <h3 className="text-[15px] font-medium tracking-tight text-fg">{tool.name}</h3>
+        <p className="text-[15px] font-medium tracking-tight text-fg">{tool.name}</p>
         <p className="line-clamp-2 text-[13px] leading-relaxed text-fg-muted">{tool.shortDescription}</p>
       </div>
     </Link>
