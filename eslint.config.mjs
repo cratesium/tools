@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Copied third-party bundles (FFmpeg, pdf.js, libarchive).
+    "public/vendor/**",
   ]),
 ]);
 

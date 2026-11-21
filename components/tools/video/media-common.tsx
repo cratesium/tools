@@ -46,11 +46,11 @@ export function useNativeMeta(url: string | null, kind: "video" | "audio") {
   return meta && meta.url === url ? meta.meta : null;
 }
 
-export function MediaPicker({ file, onFile, kind, multiple, onFiles, label }: { file: File | null; onFile: (f: File | null) => void; kind: "video" | "audio"; multiple?: boolean; onFiles?: (f: File[]) => void; label?: string }) {
+export function MediaPicker({ file, onFile, kind, multiple, onFiles, label, accept }: { file: File | null; onFile: (f: File | null) => void; kind: "video" | "audio"; multiple?: boolean; onFiles?: (f: File[]) => void; label?: string; accept?: string }) {
   if (file && !multiple) return <FileList files={[file]} onClear={() => onFile(null)} />;
   return (
     <Dropzone
-      accept={kind === "video" ? VIDEO_ACCEPT : AUDIO_ACCEPT}
+      accept={accept ?? (kind === "video" ? VIDEO_ACCEPT : AUDIO_ACCEPT)}
       multiple={multiple}
       maxSize={MAX_MEDIA_BYTES}
       formatsLabel={label ?? (kind === "video" ? "MP4, MOV, MKV, WebM, AVI and more (up to 1 GB)" : "MP3, WAV, M4A, AAC, FLAC, OGG and more")}
