@@ -151,9 +151,19 @@ export function InlineSearch({ autoFocus, placeholder = "Search 304 tools…" }:
 /** ⌘K / Ctrl+K command palette available on every page. */
 export function CommandSearch() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
+  const setOpen = useCallback((v: boolean | ((o: boolean) => boolean)) => {
+    setOpenState((o) => {
+      const next = typeof v === "function" ? v(o) : v;
+      if (next && !o) {
+        setQ("");
+        setActive(0);
+      }
+      return next;
+    });
+  }, []);
   const inputRef = useRef<HTMLInputElement>(null);
   const { index, error } = useSearchIndex(open);
   const results = useMemo(() => (index ? searchTools(index, q, { limit: 10 }) : []), [index, q]);
@@ -175,11 +185,7 @@ export function CommandSearch() {
   }, [open]);
 
   useEffect(() => {
-    if (open) {
-      setQ("");
-      setActive(0);
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
+    if (open) setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
   const pick = (t: ToolSummary) => {

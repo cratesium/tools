@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState , useSyncExternalStore } from "react";
 import { Search } from "lucide-react";
 import type { CategorySlug, ToolSummary } from "@/types/tool";
 import { searchTools } from "@/lib/tools/search";
 import { ToolGrid } from "@/components/tools/tool-card";
 import { cn } from "@/lib/utils/cn";
+
+const noopSubscribe = () => () => {};
 
 export function ToolsExplorer({
   tools,
@@ -14,16 +16,13 @@ export function ToolsExplorer({
   tools: ToolSummary[];
   categories: { slug: CategorySlug; name: string; count: number }[];
 }) {
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState<CategorySlug | "all">("all");
-
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const qq = p.get("q");
-    const cc = p.get("category");
-    if (qq) setQ(qq);
-    if (cc && categories.some((c) => c.slug === cc)) setCat(cc as CategorySlug);
-  }, [categories]);
+  const search = useSyncExternalStore(noopSubscribe, () => window.location.search, () => "");
+  const params = new URLSearchParams(search);
+  const urlCat = params.get("category");
+  const [qState, setQ] = useState<string | null>(null);
+  const [catState, setCat] = useState<CategorySlug | "all" | null>(null);
+  const q = qState ?? params.get("q") ?? "";
+  const cat = catState ?? (urlCat && categories.some((c) => c.slug === urlCat) ? (urlCat as CategorySlug) : "all");
 
   const results = useMemo(() => searchTools(tools, q, { category: cat }), [tools, q, cat]);
 

@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 export function MobileNav({ categories }: { categories: { slug: string; name: string }[] }) {
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  // Remember which path the menu was opened on; navigating elsewhere closes it.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (f: (o: boolean) => boolean) => setOpenOn(f(open) ? pathname : null);
   return (
     <div className="md:hidden">
       <button

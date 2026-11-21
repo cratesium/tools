@@ -1,20 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 /** Creates an object URL for a Blob and revokes it when the blob changes or the component unmounts. */
 export function useObjectUrl(blob: Blob | null | undefined): string | null {
-  const [url, setUrl] = useState<string | null>(null);
+  const [entry, setEntry] = useState<{ blob: Blob; url: string } | null>(null);
   useEffect(() => {
-    if (!blob) {
-      setUrl(null);
-      return;
-    }
+    if (!blob) return;
     const u = URL.createObjectURL(blob);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
+    // Deferred so the effect doesn't set state synchronously; the URL is ready next tick.
+    const t = setTimeout(() => setEntry({ blob, url: u }), 0);
+    return () => {
+      clearTimeout(t);
+      URL.revokeObjectURL(u);
+    };
   }, [blob]);
-  return url;
+  return blob && entry?.blob === blob ? entry.url : null;
 }
 
 export type TaskStatus = "idle" | "running" | "done" | "error";
@@ -109,15 +110,18 @@ export function useDebounced<T>(value: T, ms = 200): T {
 }
 
 /** Feature detection that is safe during prerender (returns null until mounted). */
+const noopSubscribe = () => () => {};
+
 export function useSupport(check: () => boolean): boolean | null {
-  const [ok, setOk] = useState<boolean | null>(null);
-  useEffect(() => {
-    try {
-      setOk(check());
-    } catch {
-      setOk(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return ok;
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => {
+      try {
+        return check();
+      } catch {
+        return false;
+      }
+    },
+    () => null,
+  );
 }

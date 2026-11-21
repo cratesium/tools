@@ -2,7 +2,7 @@
 
 UtilityHub is a website with **304 free online tools** in 13 categories: PDF, image, video, audio, archive, text, developer, spreadsheet/data, security, QR/barcode, calculators, file management and web. It is a static-first Next.js site deployed on Cloudflare Pages. Almost every tool processes files **locally in the browser** with WebAssembly, Web Workers, Canvas, Web Audio and Web Crypto. A small set of web tools uses Cloudflare Pages Functions.
 
-- Live status of every tool: [`docs/TOOL-STATUS.md`](docs/TOOL-STATUS.md)
+- Live status of every tool: [`docs/TOOL-STATUS.md`](docs/TOOL-STATUS.md). Currently **263 full, 26 partial, 15 API/server, 0 planned**.
 - How to add or implement a tool: [`docs/ADDING-TOOLS.md`](docs/ADDING-TOOLS.md)
 - Server-side endpoints: [`docs/FUNCTIONS.md`](docs/FUNCTIONS.md)
 
@@ -15,7 +15,7 @@ UtilityHub is a website with **304 free online tools** in 13 categories: PDF, im
 | Hosting | Cloudflare Pages (static `out/`), plus Cloudflare Pages Functions (`functions/`) only where a server is unavoidable |
 | PDF | pdf-lib, @cantoo/pdf-lib (encryption), PDF.js, Tesseract.js (OCR), docx, mammoth, pptxgenjs |
 | Images | Canvas API, exifr, heic2any, imagetracerjs, Transformers.js (background removal) |
-| Video / audio | FFmpeg.wasm (single-thread core from CDN), Web Audio API, MediaRecorder, Speech Synthesis, Transformers.js Whisper |
+| Video / audio | FFmpeg.wasm (single-thread core, self-hosted under `/vendor/ffmpeg`), Web Audio API, MediaRecorder, Speech Synthesis, Transformers.js Whisper |
 | Archives | fflate, JSZip, zip.js (AES ZIP), libarchive.js (RAR / 7Z / TAR) |
 | Data | SheetJS (xlsx), fast-xml-parser, js-yaml |
 | Developer | Prettier (standalone), Terser, CSSO, sql-formatter, node-sql-parser, marked, turndown, DOMPurify, jsdiff |
@@ -129,7 +129,7 @@ Details and rules: [`docs/ADDING-TOOLS.md`](docs/ADDING-TOOLS.md).
 
 - Tool state lives in React component state per tab. There is no global or shared storage, so visitors are isolated by construction (and covered by e2e tests).
 - Object URLs are revoked on reset/unmount, and every tool has a Reset button.
-- Files are never uploaded by browser-side tools. Some tools download an engine or model (FFmpeg core, Tesseract language data, Transformers.js models) from a public CDN on first use, and each tool lists this under "External dependencies".
+- Files are never uploaded by browser-side tools. FFmpeg, pdf.js and libarchive are self-hosted from this site's `/vendor/` folder (copied from `node_modules` by `scripts/copy-vendor.mjs` at build time; the FFmpeg wasm is split into <25 MB parts to fit Cloudflare Pages' file limit). Only Tesseract language data and Transformers.js models (background removal, Whisper) are downloaded from a public CDN / the Hugging Face Hub on first use, and each tool lists this under "External dependencies".
 - Pages Functions receive only URLs or domains (never files), validate them against SSRF, and store nothing except URL-shortener entries in KV.
 
 ## Deploying to Cloudflare Pages (via GitHub)
@@ -172,9 +172,10 @@ See `.env.example`.
 See [`docs/TOOL-STATUS.md`](docs/TOOL-STATUS.md) for the per-tool list. In general:
 
 - **Office conversions** (PDF↔Word/PowerPoint, Word/HTML→PDF) run in the browser and do not preserve complex layout. They are marked *Partial*.
-- **Video/audio** processing uses single-threaded FFmpeg.wasm. It is slower than native, limited by browser memory (keep files under ~500 MB), and downloads a ~31 MB core on first use.
+- **Video/audio** processing uses single-threaded FFmpeg.wasm. It is slower than native, limited by browser memory (keep files under ~500 MB), and loads a ~31 MB self-hosted core on first use (cached afterwards). Video Reverse is limited to 60-second clips; burning subtitles into the picture and text rendering via drawtext are not available (text watermarks are rasterised in the browser instead).
 - **AI features** (background removal, speech-to-text, OCR) download models or language data on first use and run on your device. Their speed depends on your hardware.
 - **Web tools** that fetch other sites need the Cloudflare Functions. They do not work under plain `next dev`, and some sites block automated requests.
 - **SSL Certificate Checker** reports Certificate Transparency data plus HTTPS reachability, not a raw TLS handshake (Workers cannot read peer certificates).
 - **URL Shortener** and **Website Screenshot** need account configuration (KV namespace, Browser Rendering token) and report "not configured" until then.
+- **Text to Speech** uses the browser's Web Speech voices: playback only, no audio download (browsers don't expose the audio). **Video thumbnails/screenshots** use the browser's decoder, so MKV/AVI must be converted to MP4 first.
 - WebP encoding is unavailable in some Safari versions. The File System Access API (in-place renaming, writing folders) is Chromium-only, and other browsers fall back to ZIP downloads.

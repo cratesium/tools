@@ -14,28 +14,26 @@ type Props = ToolComponentProps;
  * tabs or tool instances.
  */
 export function ToolRunner({ tool }: Props) {
-  const [Comp, setComp] = useState<ComponentType<ToolComponentProps> | null>(null);
-  const [missing, setMissing] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const planned = tool.status === "planned" || tool.processor === "planned";
+  const [loaded, setLoaded] = useState<{ key: string; comp: ComponentType<ToolComponentProps> | null; error: string | null } | null>(null);
+  const key = `${tool.category}/${tool.processor}`;
+  const current = loaded?.key === key ? loaded : null;
+  const Comp = current?.comp ?? null;
+  const loadError = current?.error ?? null;
+  const missing = planned || (current != null && !current.comp && !current.error);
 
   useEffect(() => {
     let alive = true;
-    if (tool.status === "planned" || tool.processor === "planned") {
-      setMissing(true);
-      return;
-    }
+    if (planned) return;
     categoryLoaders[tool.category]()
       .then((m) => {
-        if (!alive) return;
-        const c = m.default[tool.processor];
-        if (c) setComp(() => c);
-        else setMissing(true);
+        if (alive) setLoaded({ key, comp: m.default[tool.processor] ?? null, error: null });
       })
-      .catch((e) => alive && setLoadError(String(e?.message ?? e)));
+      .catch((e) => alive && setLoaded({ key, comp: null, error: String(e?.message ?? e) }));
     return () => {
       alive = false;
     };
-  }, [tool.category, tool.processor, tool.status]);
+  }, [tool.category, tool.processor, planned, key]);
 
   if (loadError)
     return (
