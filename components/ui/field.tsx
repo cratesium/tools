@@ -15,10 +15,12 @@ const control =
 
 export function Label({ htmlFor, children, hint }: { htmlFor?: string; children: ReactNode; hint?: ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1.5 flex items-baseline justify-between gap-2 text-[13px] font-medium text-fg">
-      <span>{children}</span>
+    <div className="mb-1.5 flex items-baseline justify-between gap-2 text-[13px]">
+      <label htmlFor={htmlFor} className="font-medium text-fg">
+        {children}
+      </label>
       {hint ? <span className="text-xs font-normal text-fg-subtle">{hint}</span> : null}
-    </label>
+    </div>
   );
 }
 
